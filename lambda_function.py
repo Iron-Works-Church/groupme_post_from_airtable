@@ -14,13 +14,19 @@ from urllib.request import Request, urlopen
 
 
 
-
+def find_bot_id(bot_name):
+    for k,v in bot_ids.items():
+        if k == bot_name:
+            return(v)
+    print("no bot ID found")
+    quit()
 
 with open("creds.json", encoding='utf-8') as f:
     credentials = json.load(f)
     airtable_api_key = credentials["airtable_api_key"]
     airtable_api_url = credentials["airtable_api_url"]
     groupme_bot_id = credentials["groupme_bot_id"]
+    bot_ids = credentials["bot_ids"]
 
 
 def get_airtable_records(airtable_api_key):
@@ -42,7 +48,8 @@ def find_posts(records):
             now = now.replace(tzinfo=timezone('UTC'))
             if now > date_time_obj_utc:
                 if not "POSTED" in i["fields"]:
-                    send_message(i["fields"]["Writeup"])
+                    bot_id = find_bot_id(i["fields"]["Bot"])
+                    send_message(i["fields"]["Writeup"], bot_id)
                     update_airtable_posted(i["id"])
 
 def update_airtable_posted(record_id):
@@ -51,11 +58,11 @@ def update_airtable_posted(record_id):
     data = json.dumps(data)
     r = requests.patch('{}/Table%201'.format(airtable_api_url), headers=headers, data=data)
 
-def send_message(msg):
+def send_message(msg, bot_id):
   url  = 'https://api.groupme.com/v3/bots/post'
 
   data = {
-          'bot_id' : groupme_bot_id,
+          'bot_id' : bot_id,
           'text'   : msg,
          }
   request = Request(url, urlencode(data).encode())
@@ -69,3 +76,4 @@ def lambda_handler(event, context):
         'statusCode': 200,
         'body': json.dumps("Completed")
     }
+lambda_handler("test", "test")
