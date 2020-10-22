@@ -1,0 +1,4 @@
+This is a simple Python program to post on a schedule to GroupME using the BOT API.  The data comes from Airtable and CloudWatch runs the AWS lambda job every 15 minutes from 8am to 8pm daily.
+Images can be attached using the images field in Airtable and the program will upload them to the GroupME image processing service.
+
+All credentials/urls' stored in AWS DynamoDB.
